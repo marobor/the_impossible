@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Hello {{name}}!
+{% endblock %}
+
+{% block content %}
+    <body class="helloBody">
+    <video class="videoBackground" autoplay muted loop>
+        <source src="{{ url_for('static', filename="background.mp4") }}" type="video/mp4">
+    </video>
+    <header class="viewport-header">
+        <h1>
+            THE&nbsp;IMPOSSIBLE
+            <span>RODNEY MULLEN&nbsp;I&nbsp;TRICKI NA&nbsp;DESKOROLKĘ</span>
+        </h1>
+    </header>
+    <a href="#">Przejdź dalej >></a>
+    </body>
+{% endblock  %}
