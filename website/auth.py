@@ -33,6 +33,8 @@ def login():
             if check_password_hash(user.password, password):
                 flash('Logged in!', category='success')
                 login_user(user, remember=True)
+
+                # admin is redirected to the admin panel, regular user to the home page
                 if Role.query.filter_by(id=2).first() in current_user.roles:
                     print(type(current_user.roles))
                     return redirect(url_for('views.admin_console'))

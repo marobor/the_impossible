@@ -1,4 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Post{% endblock %}
 {% block content %}
+    <div class="row mt-5">
+        <div class="col">
+            <img src="./static/uploads/{{ post.image }}" class="img-fluid" alt="{{ post.image }}">
+        </div>
+        <div class="col">
+            <h1>{{ post.title }}</h1>
+            {{ post.content|safe }}
+        </div>
+    </div>
 {% endblock %}
