@@ -1,13 +1,61 @@
 {% extends "base.html" %}
 {% block title %}Post{% endblock %}
 {% block content %}
-    <div class="row mt-5">
-        <div class="col">
-            <img src="./static/uploads/{{ post.image }}" class="img-fluid" alt="{{ post.image }}">
-        </div>
-        <div class="col">
-            <h1>{{ post.title }}</h1>
-            {{ post.content|safe }}
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-2">
+                <ul class="nav flex-column">
+                    {% for link in posts %}
+                        {% if post.title == link.title %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page"
+                                   href="{{ link.slug }}">{{ link.title }}</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ link.slug }}">{{ link.title }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-8">
+                <div class="row mt-5 align-items-center">
+                    <div class="col">
+                        <img src="./static/uploads/{{ post.image }}" class="img-fluid" alt="{{ post.image }}">
+                    </div>
+                    <div class="col">
+                        <h1>{{ post.title }}</h1>
+                        {{ post.content|safe }}
+                    </div>
+                </div>
+                {% for link in posts %}
+                    {% if link.title == post.title %}
+                        {% if loop.nextitem and loop.previtem %}
+                            <div class="row justify-content-center">
+                                <div class="col">
+                                    <a href="{{ loop.previtem.slug }}">< {{ loop.previtem.title }}</a>
+                                </div>
+                                <div class="col">
+                                    <a href="{{ loop.nextitem.slug }}">{{ loop.nextitem.title }} ></a>
+                                </div>
+                            </div>
+                        {% elif loop.nextitem %}
+                            <div class="row justify-content-end">
+                                <div class="col">
+                                    <a href="{{ loop.nextitem.slug }}">{{ loop.nextitem.title }} ></a>
+                                </div>
+                            </div>
+                        {% elif loop.previtem %}
+                            <div class="row justify-content-start">
+                                <div class="col">
+                                    <a href="{{ loop.previtem.slug }}">< {{ loop.previtem.title }}</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}

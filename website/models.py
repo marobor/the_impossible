@@ -2,6 +2,8 @@ from . import db
 import re
 from time import time
 
+from unidecode import unidecode
+
 from flask_security import UserMixin, RoleMixin
 
 from sqlalchemy.sql import func
@@ -16,7 +18,8 @@ roles_users = db.Table('roles_users',
 # Function that processes title of a post and returns a slug.
 def slugify(post_title):
     pattern = r'[^\w+]'
-    return str.lower(re.sub(pattern, '-', post_title))
+    title = unidecode(post_title)
+    return str.lower(re.sub(pattern, '-', title))
     # TODO: Slugify does not work properly
     #  (python-slugify package may help)
 

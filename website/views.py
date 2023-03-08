@@ -13,7 +13,10 @@ views = Blueprint("views", __name__)
 
 @views.route("/home")
 def home():
-    return render_template("index.html", user=current_user)
+    post = Post.query.first()
+    posts = Post.query.all()
+    return render_template('posts/post.html', post=post, posts=posts, user=current_user)
+    # return render_template("index.html", user=current_user)
 
 
 @views.route("/")
@@ -37,7 +40,8 @@ def admin_console():
 @views.route('/<slug>')
 def show_post(slug):
     post = Post.query.filter(Post.slug == slug).first()
-    return render_template('posts/post.html', post=post, user=current_user)
+    posts = Post.query.all()
+    return render_template('posts/post.html', post=post, posts=posts, user=current_user)
 
 
 @views.route('/create-post', methods=['GET', 'POST'])
@@ -46,7 +50,7 @@ def show_post(slug):
 def create_post():
     if request.method == 'POST':
         title = request.form.get("title")
-        content = request.form.get("ckeditor")
+        content = request.form.get("content")
         file = request.files['file']
 
         # TODO: Default image if video not provided
