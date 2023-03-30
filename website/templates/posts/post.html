@@ -20,6 +20,9 @@
                 </ul>
             </div>
             <div class="col-8">
+            {% if user.has_role('admin') %}
+            <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj post</a>
+            {% endif %}
                 <div class="row mt-5 align-items-center">
                     <div class="col">
                         <img src="./static/uploads/{{ post.image }}" class="img-fluid" alt="{{ post.image }}">

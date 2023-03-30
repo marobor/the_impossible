@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Create a post{% endblock %}
+{% block content %}
+    <div class="container">
+        {# ckeditor.load() #}
+        <h1 align="center">Edit a post</h1>
+        <img src="{{ url_for('static', filename='/uploads/' + post.image) }}" style="width: 15%; height: auto;" alt="{{ post.image }}">
+        <form method="POST" enctype="multipart/form-data">
+            <label for="file" class="form-label">Upload photo</label>
+            <input type = "file" name = "file" value="{{ post.image }}"/>
+            <label for="title" class="form-label">Post title</label>
+            <input type="text" id="title" name="title" class="form-control mb-4" value="{{ post.title }}">
+            <label for="content" class="form-label">Post</label>
+            <textarea name="content" id="content" class="form-control mb-4" placeholder="{{ post.content }}"></textarea>
+            <div align="center">
+                <button type="submit" class="btn btn-lg btn-primary">Post</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,7 +1,65 @@
 {% extends "base.html" %}
 {% block title %}My tricks{% endblock %}
 {% block content %}
-    <div class="container">
-
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-2">
+                <ul class="nav flex-column">
+                    {% for link in tricks %}
+                        {% if trick.name == link.name %}
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page"
+                                   href="{{ url_for('views.my_trick', trick_name=link.name) }}">
+                                    {{ link.name }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('views.my_trick', trick_name=link.name) }}">
+                                    {{ link.name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-2">
+                <h2>{{ trick.name }}</h2>
+                <ul class="nav flex-column">
+                    {% for variant in all_variants %}
+                        {% if variant.id in user_variants %}
+                            <li class="nav-item d-flex align-items-center justify-content-between">
+                                {{ variant.name }}
+                                <a class="nav-link"
+                                   href="{{ url_for('views.trick_archive', trick_name=trick.name, trick_variant=variant.name) }}">
+                                    <i class="fa-sharp fa-solid fa-arrow-right" title="Zobacz trick"></i>
+                                </a>
+                                <a class="nav-link"
+                                   href="{{ url_for('views.user_edit_trick', trick_name=trick.name, trick_variant=variant.name) }}">
+                                    <i class="fa-sharp fa-solid fa-pencil" title="Edytuj trick"></i>
+                                </a>
+                                <form method="POST"
+                                      action="{{ url_for('views.delete_trick', trick_name=trick.name, trick_variant=variant.name) }}">
+                                    <input type="submit" class="nav-link" value="Usuń"
+                                           onclick="return confirm('Are you sure you want to delete this entry?')">
+                                </form>
+{#                                <a #}
+{#                                   href="{{ url_for('views.delete_trick', trick_name=trick.name, trick_variant=variant.name) }}">#}
+{#                                    <i class="fa-solid fa-trash-can" title="Usuń trick"></i>#}
+{#                                </a>#}
+                            </li>
+                        {% else %}
+                            <li class="nav-item d-flex align-items-center justify-content-between">
+                                {{ variant.name }}
+                                <a class="nav-link"
+                                   href="{{ url_for('views.add_trick', trick_name=trick.name, trick_variant=variant.name) }}">
+                                    <i class="fa-sharp fa-solid fa-plus" title="Dodaj trick"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}All posts{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 align="center">Wszystkie artykuły</h1>
+        <ul>
+            {% for post in posts %}
+                <li>
+                    {{ post.title }}
+                    <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj artykuł</a>
+                    <form method="POST" class="d-inline-flex"
+                          action="#">
+                        <input type="submit" class="nav-link" value="Usuń"
+                               onclick="return confirm('Are you sure you want to delete this entry?')">
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Admin console{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Admin Console</h1>
+        <h2>Zarządzaj postami</h2>
+        <a href="/create-post">Nowy post</a><br>
+        <a href="/all-posts">Wszystkie posty</a><br>
+        <a href="#">Kategorie postów</a><br>
+        <h2>Zarządzaj trickami</h2>
+        <a href="#">Wszystkie tricki</a><br>
+        <a href="#">Wszystkie warianty</a><br>
+        <a href="/create-trick">Nowy trick</a><br>
+        <a href="/create-variant">Nowy wariant</a><br>
+        <h2>Zarządzaj użytkownikami</h2>
+        <a href="#">Wszyscy użytkownicy</a><br>
+    </div>
+{% endblock %}
