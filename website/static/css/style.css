@@ -1,0 +1,50 @@
+body {
+    font-family: Oswald, sans-serif;
+}
+
+p {
+
+}
+
+h1 {
+
+}
+
+h2 {
+
+}
+
+h3 {
+
+}
+
+h4 {
+
+}
+
+h5 {
+
+}
+
+a {
+
+}
+
+.my-nav{
+    padding-bottom: 0;
+    background-color: black;
+}
+
+.my-nav img{
+    max-height: 90px;
+    width: auto;
+    align-self: end;
+}
+
+.post-admin div{
+    display: inline-block;
+}
+
+.post-admin h1{
+    display: inline-block;
+}

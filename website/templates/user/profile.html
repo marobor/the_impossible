@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Profil{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <h1>Profil</h1>
+        <div class="row align-items-center">
+            <div class="col-2">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.my_trick', trick_name='Ollie') }}">
+                            Dodaj tricki
+                        </a>
+                        <a href="#" class="nav-link" >
+                            Zmień hasło
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-2">
+                <p><b>Moje punkty</b>: {{ user_data.skill_points }}</p>
+                <h2>Oś czasu</h2>
+                {% for trick in tricks %}
+                    <b>{{ trick.trick_variant.name }} {{ trick.trick.name }}</b>
+                    <p>{{ trick.created_at.strftime('%d %m %Y') }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

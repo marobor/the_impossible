@@ -8,10 +8,16 @@
         <form method="POST" enctype="multipart/form-data">
             <label for="file" class="form-label">Upload photo</label>
             <input type = "file" name = "file" value="{{ post.image }}"/>
+            <select name="category" class="form-select">
+                    <option value="{{ post.category_id }}">{{ current_category }}</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
             <label for="title" class="form-label">Post title</label>
             <input type="text" id="title" name="title" class="form-control mb-4" value="{{ post.title }}">
             <label for="content" class="form-label">Post</label>
-            <textarea name="content" id="content" class="form-control mb-4" placeholder="{{ post.content }}"></textarea>
+            <textarea name="content" id="content" class="form-control mb-4">{{ post.content }}</textarea>
             <div align="center">
                 <button type="submit" class="btn btn-lg btn-primary">Post</button>
             </div>

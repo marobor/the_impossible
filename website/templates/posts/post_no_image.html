@@ -21,9 +21,6 @@
             </div>
             <div class="col-8">
                 <div class="row mt-5 align-items-center">
-                    <div class="col">
-                        <img src="{{ url_for('static', filename='/uploads/' + post.image) }}" class="img-fluid" alt="{{ post.image }}">
-                    </div>
                     <section class="col">
                         {% if user.has_role('admin') %}
                         <div class="post-admin">

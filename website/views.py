@@ -7,38 +7,41 @@ from datetime import datetime, date
 import os
 
 from . import db
-from .models import Post, Trick, TrickVariant, UsersTricks, UserData, slugify
+from .models import Post, Trick, TrickVariant, UsersTricks, UserData, slugify, Category
 
 views = Blueprint("views", __name__)
 
 
 @views.route("/")
 def intro():
-    print(current_app.config['UPLOAD_FOLDER'])
     return render_template("intro.html", user=current_user)
 
 
 @views.route("/home")
 def home():
-    post = Post.query.first()
-    posts = Post.query.all()
-    return render_template('posts/post.html', post=post, posts=posts, user=current_user)
+    post = Post.query.filter(Post.category_id == 2).first()
+    posts = Post.query.filter(Post.category_id == 2).all()
+    category = Category.query.filter(Category.id == 2).first()
+    return render_template('posts/post.html', post=post, posts=posts, user=current_user, category=category.name)
     # return render_template("index.html", user=current_user)
+
+
+@views.route("/about")
+def about():
+    post = Post.query.filter(Post.category_id == 3).first()
+    posts = Post.query.filter(Post.category_id == 3).all()
+    category = Category.query.filter(Category.id == 3).first()
+    return render_template('posts/post.html', post=post, posts=posts, user=current_user, category=category.name)
 
 
 @views.route('/profile')
 @login_required
 def profile():
-    return "<h1>PROFILE</h1>"
+    u_tricks = db.session.query(UsersTricks).join(Trick).join(TrickVariant).\
+        filter(UsersTricks.user_id == current_user.id).order_by(UsersTricks.created_at.desc())
+    user_data = UserData.query.filter(UserData.user_id == current_user.id).first()
 
-
-# @views.route('/my-tricks')
-# @login_required
-# def my_tricks():
-#     # TODO: NA TEJ STRONIE BĘDZIE MOŻNA ZOBACZYĆ WSZYSTKIE TRICKI CHRONOLOGICZNIE ORAZ ILOŚĆ PUNKTÓW I RANGĘ
-#
-#     return render_template('my_tricks.html', trick=first, tricks=tricks,
-#                            user=current_user, variants=variants)
+    return render_template('user/profile.html', user=current_user, tricks=u_tricks, user_data=user_data)
 
 
 @views.route('/trick/<trick_name>')
@@ -182,11 +185,15 @@ def admin_console():
     return render_template("admin/admin_console.html", user=current_user)
 
 
-@views.route('/<slug>')
-def show_post(slug):
+@views.route('<category>/<slug>')
+def show_post(slug, category):
+    post_category = Category.query.filter(Category.name == category).first()
     post = Post.query.filter(Post.slug == slug).first()
-    posts = Post.query.all()
-    return render_template('posts/post.html', post=post, posts=posts, user=current_user)
+    posts = Post.query.filter(Post.category_id == post_category.id).all()
+    if post.image:
+        return render_template('posts/post.html', post=post, posts=posts, user=current_user, category=post_category.name)
+    else:
+        return render_template('posts/post_no_image.html', post=post, posts=posts, user=current_user, category=post_category.name)
 
 
 # TODO: DOKOŃCZYĆ WYŚWIETLANIE WSZYSTKICH POSTÓW - lista do edycji i usuwania
@@ -202,25 +209,32 @@ def show_all_posts():
 @login_required
 @roles_required('admin')
 def create_post():
+    categories = Category.query.all()
     if request.method == 'POST':
         title = request.form.get("title")
         content = request.form.get("content")
         file = request.files['file']
+        category = request.form.get("category")
 
         # TODO: Default image if video not provided
-        if not title or not content:
+        if not title or not content or not category:    # or not file
             flash('Please fill in all the fields.', category='error')
-        else:
+        elif file:
             filename = secure_filename(file.filename)
             # TODO: CONTENT TYPE filetype = file.content_type
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-            new_post = Post(title=title, content=content, image=filename)
+            new_post = Post(title=title, content=content, image=filename, category_id=category)
+            db.session.add(new_post)
+            db.session.commit()
+            flash('Post created!', category='success')
+        else:
+            new_post = Post(title=title, content=content, image='', category_id=category)
             db.session.add(new_post)
             db.session.commit()
             flash('Post created!', category='success')
             # return redirect(url_for('views.admin_console'))
 
-    return render_template("posts/create_post.html", user=current_user)
+    return render_template("posts/create_post.html", user=current_user, categories=categories)
 
 
 @views.route('/edit-post/<slug>', methods=['GET', 'POST'])
@@ -229,11 +243,14 @@ def create_post():
 def edit_post(slug):
 
     post_to_edit = Post.query.filter(Post.slug == slug).first()
+    current_category = Category.query.filter(Category.id == post_to_edit.category_id).first()
+    categories = Category.query.filter(Category.id != post_to_edit.category_id).all()
 
     if request.method == 'POST':
         title = request.form.get("title")
         content = request.form.get("content")
         file = request.files['file']
+        category = request.form.get('category')
         if post_to_edit:
             filename = secure_filename(file.filename)
 
@@ -246,18 +263,29 @@ def edit_post(slug):
 
             post_to_edit.title = title
             post_to_edit.content = content
+            post_to_edit.category_id = category
             post_to_edit.edited_at = datetime.now()
 
             db.session.add(post_to_edit)
             db.session.commit()
             flash('Post edited!', category='success')
-            return redirect(url_for('views.edit_post', slug=post_to_edit.slug))
+            return redirect(url_for('views.show_all_posts'))
         else:
             flash('Post not found.', category='error')
             return redirect(url_for('views.all-posts'))
 
     return render_template('posts/edit_post.html', post=post_to_edit,
-                           user=current_user)
+                           user=current_user, current_category=current_category.name, categories=categories)
+
+
+@views.route('/delete-post/<slug>', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def delete_post(slug):
+    post_to_delete = Post.query.filter(Post.slug == slug).first()
+    db.session.delete(post_to_delete)
+    db.session.commit()
+    return redirect(url_for('views.show_all_posts'))
 
 
 @views.route('/create-trick', methods=['GET', 'POST'])

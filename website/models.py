@@ -52,6 +52,13 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(150), unique=True)
 
 
+class Category(db.Model):
+    __tablename__ = 'category'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+    post = db.relationship("Post", uselist=False, backref="post")
+
+
 # Create table in database for storing posts
 class Post(db.Model):
     __tablename__ = 'post'
@@ -62,6 +69,7 @@ class Post(db.Model):
     content = db.Column(db.Text)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     edited_at = db.Column(db.DateTime(timezone=True), default=func.now())
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

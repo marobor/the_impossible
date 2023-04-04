@@ -9,7 +9,7 @@
                     {{ post.title }}
                     <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj artykuł</a>
                     <form method="POST" class="d-inline-flex"
-                          action="#">
+                          action="{{ url_for('views.delete_post', slug=post.slug) }}">
                         <input type="submit" class="nav-link" value="Usuń"
                                onclick="return confirm('Are you sure you want to delete this entry?')">
                     </form>
