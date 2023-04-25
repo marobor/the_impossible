@@ -2,33 +2,67 @@
 {% block title %}Post{% endblock %}
 {% block content %}
     <div class="container-fluid">
-        <div class="row align-items-center">
+        <div class="row">
+
+{#        TODO: OGARNĄĆ NAWIGACJĘ DRUGIEGO RZĘDU DLA MOBILNYCH #}
+            <div class="accordion side-nav-mobile" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            POZOSTAŁE TRICKI
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                         data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <ul class="nav flex-column">
+                                {% for link in posts %}
+                                    {% if post.title == link.title %}
+                                        <li class="nav-item">
+                                            <a class="nav-link active" aria-current="page"
+                                               href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="nav-item">
+                                            <a class="nav-link"
+                                               href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="col-2">
-                <ul class="nav flex-column">
+                <ul class="nav flex-column side-nav">
                     {% for link in posts %}
                         {% if post.title == link.title %}
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page"
-                                   href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
+                            <li class="nav-item side-nav-item active">
+                                <a href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
                             </li>
                         {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
+                            <li class="nav-item side-nav-item">
+                                <a href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </div>
+
             <div class="col-8">
-                <div class="row mt-5 align-items-center">
-                    <section class="col">
+                <div class="post">
+                    <section class="post-content-no-img">
                         {% if user.has_role('admin') %}
-                        <div class="post-admin">
-                            <h1>{{ post.title }}</h1>
-                            <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj post</a>
-                        </div>
+                            <div class="post-admin">
+                                <h1>{{ post.title }}</h1>
+                                <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj post</a>
+                            </div>
                         {% else %}
-                        <h1>{{ post.title }}</h1>
+                            <h1>{{ post.title }}</h1>
                         {% endif %}
                         {{ post.content|safe }}
                     </section>
@@ -36,24 +70,26 @@
                 {% for link in posts %}
                     {% if link.title == post.title %}
                         {% if loop.nextitem and loop.previtem %}
-                            <div class="row justify-content-center">
-                                <div class="col">
-                                    <a href="{{ url_for('views.show_post', slug=loop.previtem.slug, category=category) }}">< {{ loop.previtem.title }}</a>
+                            <div class="d-flex mt-5 justify-content-between">
+                                <div>
+                                    <a href="{{ url_for('views.show_post', slug=loop.previtem.slug, category=category) }}"><< {{ loop.previtem.title }}</a>
                                 </div>
-                                <div class="col">
-                                    <a href="{{ url_for('views.show_post', slug=loop.nextitem.slug, category=category) }}">{{ loop.nextitem.title }} ></a>
+                                <div>
+                                    <a href="{{ url_for('views.show_post', slug=loop.nextitem.slug, category=category) }}">{{ loop.nextitem.title }}
+                                        >></a>
                                 </div>
                             </div>
                         {% elif loop.nextitem %}
-                            <div class="row justify-content-end">
-                                <div class="col">
-                                    <a href="{{ url_for('views.show_post', slug=loop.nextitem.slug, category=category) }}">{{ loop.nextitem.title }} ></a>
+                            <div class="d-flex mt-5 justify-content-end">
+                                <div>
+                                    <a href="{{ url_for('views.show_post', slug=loop.nextitem.slug, category=category) }}">{{ loop.nextitem.title }}
+                                        >></a>
                                 </div>
                             </div>
                         {% elif loop.previtem %}
-                            <div class="row justify-content-start">
-                                <div class="col">
-                                    <a href="{{ url_for('views.show_post', slug=loop.previtem.slug, category=category) }}">< {{ loop.previtem.title }}</a>
+                            <div class="d-flex mt-5 justify-content-start">
+                                <div>
+                                    <a href="{{ url_for('views.show_post', slug=loop.previtem.slug, category=category) }}"><< {{ loop.previtem.title }}</a>
                                 </div>
                             </div>
                         {% endif %}

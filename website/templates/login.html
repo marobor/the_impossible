@@ -1,20 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% block title %}Logowanie{% endblock %}
 {% block content %}
     <div class="container">
-        <form method="POST">
-            <h3 align="center">
-                Login
-            </h3>
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="text" id="email" name="email" class="form-control" placeholder="Enter Email">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Enter Password">
-                <div align="center">
-                    <button class="btn btn-primary" type="submit">Login</button>
-                </div>
+        <div class="login-form">
+            <form method="POST" class="col-6">
+                <h1>
+                    ZALOGUJ SIĘ
+                </h1>
+                <p>Nie masz konta? <a href="/sign-up">Zarejestruj się</a></p>
+                <label for="email">Adres E-mail</label>
+                <input type="text" id="email" name="email" placeholder="Wpisz adres e-mail">
+                <label for="password">Hasło</label>
+                <input type="password" id="password" name="password" placeholder="Wpisz hasło">
+                <button type="submit">DALEJ >></button>
+            </form>
+            <div class="col-6 login-info">
+
             </div>
-        </form>
+        </div>
     </div>
 {% endblock %}

@@ -4,12 +4,19 @@
     <div class="container">
         {# ckeditor.load() #}
         <h1 align="center">Edit a post</h1>
-        <img src="{{ url_for('static', filename='/uploads/' + post.image) }}" style="width: 15%; height: auto;" alt="{{ post.image }}">
+        {% if post.mimetype != 'video/mp4' %}
+            <img src="{{ url_for('static', filename='/uploads/' + post.media) }}" style="width: 15%; height: auto;"
+                 alt="{{ post.media }}">
+        {% else %}
+            <video autoplay muted loop>
+                <source src="{{ url_for('static', filename='/uploads/' + post.media) }}" type="video/mp4">
+            </video>
+        {% endif %}
         <form method="POST" enctype="multipart/form-data">
             <label for="file" class="form-label">Upload photo</label>
-            <input type = "file" name = "file" value="{{ post.image }}"/>
+            <input type="file" name="file" value="{{ post.image }}"/>
             <select name="category" class="form-select">
-                    <option value="{{ post.category_id }}">{{ current_category }}</option>
+                <option value="{{ post.category_id }}">{{ current_category }}</option>
                 {% for category in categories %}
                     <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}

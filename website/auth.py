@@ -6,9 +6,22 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
-from .models import User, UserData, Role
+from .models import User, UserData, Role, Post, Category
+from .views import inject_menu_items
 
 auth = Blueprint("auth", __name__)
+
+
+# TODO: spytać się czy da się to jakoś ładniej zrobić bo to jakiś żart jest
+@auth.context_processor
+def inject_menu_items():
+    trick_post = Post.query.filter(Post.category_id == 2).first()
+    trick_category = Category.query.filter(Category.id == 2).first()
+
+    about_post = Post.query.filter(Post.category_id == 3).first()
+    about_category = Category.query.filter(Category.id == 3).first()
+    return dict(menu_trick_post=trick_post, menu_trick_category=trick_category,
+                menu_about_post=about_post, menu_about_category=about_category)
 
 
 # Validating email using simple regex expression
@@ -28,7 +41,7 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if not is_email_valid(email) or not user:
-            flash('The email address or password is incorrect.')
+            flash('The email address or password is incorrect.', category='error')
         else:
             if check_password_hash(user.password, password):
                 flash('Logged in!', category='success')
@@ -39,7 +52,7 @@ def login():
                     print(type(current_user.roles))
                     return redirect(url_for('views.admin_console'))
                 else:
-                    return redirect(url_for('views.home'))
+                    return redirect(url_for('views.show_post', slug='ollie', category='tricki'))
 
             else:
                 flash('The email address or password is incorrect.', category='error')
@@ -90,7 +103,7 @@ def sign_up():
             db.session.commit()
             login_user(new_user, remember=True)
             flash('New account created!')
-            return redirect(url_for('views.home'))
+            return redirect(url_for('views.show_post', slug='ollie', category='tricki'))
 
     # POSSIBLE IMPROVEMENT: confirmation by email.
 
@@ -101,6 +114,6 @@ def sign_up():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("views.home"))
+    return redirect(url_for('views.show_post', slug='ollie', category='tricki'))
 
 # POSSIBLE IMPROVEMENT: change password

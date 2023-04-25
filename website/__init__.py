@@ -4,7 +4,6 @@ from os import path
 from flask_login import LoginManager, login_manager, login_user
 from flask_security import Security, SQLAlchemySessionUserDatastore
 from flask_migrate import Migrate
-# from flask_ckeditor import CKEditor
 
 db = SQLAlchemy()
 # ckeditor = CKEditor()

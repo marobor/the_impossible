@@ -8,6 +8,10 @@ from flask_security import UserMixin, RoleMixin
 
 from sqlalchemy.sql import func
 
+from sqlalchemy import event
+
+# TODO: set correct nullability
+
 # Create table in database for user_role relationship
 roles_users = db.Table('roles_users',
                        db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
@@ -19,7 +23,6 @@ def slugify(post_title):
     pattern = r'[^\w+]'
     title = unidecode(post_title)
     return str.lower(re.sub(pattern, '-', title))
-    # TODO: Slugify does not work properly
 
 
 # Create table in database for storing users
@@ -42,7 +45,7 @@ class UserData(db.Model):
     username = db.Column(db.String(150), unique=True)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    skill_points = db.Column(db.Float)
+    skill_points = db.Column(db.Float, default=0)
 
 
 # Create table in database for storing roles
@@ -52,6 +55,13 @@ class Role(db.Model, RoleMixin):
     name = db.Column(db.String(150), unique=True)
 
 
+@event.listens_for(Role.__table__, 'after_create')
+def create_roles(*args, **kwargs):
+    db.session.add(Role(name='user'))
+    db.session.add(Role(name='admin'))
+    db.session.commit()
+
+
 class Category(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
@@ -59,11 +69,20 @@ class Category(db.Model):
     post = db.relationship("Post", uselist=False, backref="post")
 
 
+@event.listens_for(Category.__table__, 'after_create')
+def create_categories(*args, **kwargs):
+    db.session.add(Category(name='default'))
+    db.session.add(Category(name='tricki'))
+    db.session.add(Category(name='inne'))
+    db.session.commit()
+
+
 # Create table in database for storing posts
 class Post(db.Model):
     __tablename__ = 'post'
     id = db.Column(db.Integer, primary_key=True)
-    image = db.Column(db.String(140))
+    media = db.Column(db.String(140), default='')
+    mimetype = db.Column(db.String(50))
     title = db.Column(db.String(140))
     slug = db.Column(db.String(140), unique=True)
     content = db.Column(db.Text)
@@ -82,17 +101,42 @@ class Post(db.Model):
             self.slug = str(int(time()))
 
 
-# TODO: set correct nullability
+@event.listens_for(Post.__table__, 'after_create')
+def create_tricks(*args, **kwargs):
+    db.session.add(Trick(title='Hello world', content='Default post for category: triki', category_id=2))
+    db.session.add(Trick(title='Hello world', content='Default post for category: inne', category_id=3))
+    db.session.commit()
 
 
-# TODO: slug for trick and variant
 # Create table in database for storing tricks
 class Trick(db.Model):
     __tablename__ = 'trick'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(140))
+    slug = db.Column(db.String(140))
     users_ticks = db.relationship('UsersTricks', backref='trick')
     value = db.Column(db.Integer)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.generate_slug()
+
+    def generate_slug(self):
+        if self.name:
+            self.slug = slugify(self.name)
+        else:
+            self.slug = str(int(time()))
+
+
+@event.listens_for(Trick.__table__, 'after_create')
+def create_tricks(*args, **kwargs):
+    db.session.add(Trick(name='Ollie', value=10))
+    db.session.add(Trick(name='Nollie', value=10))
+    db.session.add(Trick(name='Kickflip', value=20))
+    db.session.add(Trick(name='Heel flip', value=20))
+    db.session.add(Trick(name='360 flip', value=40))
+    db.session.add(Trick(name='Impossible', value=50))
+    db.session.commit()
 
 
 # Create table in database for storing tricks
@@ -100,7 +144,27 @@ class TrickVariant(db.Model):
     __tablename__ = 'trick_variant'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(140))
+    slug = db.Column(db.String(140))
     users_ticks = db.relationship('UsersTricks', backref='trick_variant')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.generate_slug()
+
+    def generate_slug(self):
+        if self.name:
+            self.slug = slugify(self.name)
+        else:
+            self.slug = str(int(time()))
+
+
+@event.listens_for(TrickVariant.__table__, 'after_create')
+def create_tricks(*args, **kwargs):
+    db.session.add(TrickVariant(name='normal'))
+    db.session.add(TrickVariant(name='switch'))
+    db.session.add(TrickVariant(name='nollie'))
+    db.session.add(TrickVariant(name='fakie'))
+    db.session.commit()
 
 
 class UsersTricks(db.Model):
