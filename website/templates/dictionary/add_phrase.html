@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Add a new trick{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 align="center">Add a new trick</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <label for="title" class="form-label">Variant name</label>
+            <input type="text" id="title" name="title" class="form-control mb-4" placeholder="Write a variant name">
+            <label for="content" class="form-label">Content</label>
+            <textarea name="content" id="content" class="form-control mb-4"></textarea>
+            <div align="center">
+                <button type="submit" class="btn btn-lg btn-primary">Add</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

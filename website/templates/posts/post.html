@@ -4,14 +4,14 @@
     <div class="container-fluid">
         <div class="row">
 
-{#      AKORDEON I NAWIGACJA NA BOKU      #}
-{#        TODO: OGARNĄĆ NAWIGACJĘ DRUGIEGO RZĘDU DLA MOBILNYCH #}
+            {#      AKORDEON I NAWIGACJA NA BOKU      #}
+            {#        TODO: OGARNĄĆ NAWIGACJĘ DRUGIEGO RZĘDU DLA MOBILNYCH #}
             <div class="accordion side-nav-mobile" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            POZOSTAŁE TRICKI
+                            WSZYSTKIE ARTYKUŁY
                         </button>
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
@@ -20,14 +20,12 @@
                             <ul class="nav flex-column">
                                 {% for link in posts %}
                                     {% if post.title == link.title %}
-                                        <li class="nav-item">
-                                            <a class="nav-link active" aria-current="page"
-                                               href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
+                                        <li class="nav-item side-nav-item active">
+                                            <a href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
                                         </li>
                                     {% else %}
-                                        <li class="nav-item">
-                                            <a class="nav-link"
-                                               href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
+                                        <li class="nav-item side-nav-item">
+                                            <a href="{{ url_for('views.show_post', slug=link.slug, category=category) }}">{{ link.title }}</a>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
@@ -38,7 +36,7 @@
             </div>
 
 
-            <div class="col-2">
+            <div class="col-1 col-xxl-2">
                 <ul class="nav flex-column side-nav">
                     {% for link in posts %}
                         {% if post.title == link.title %}
@@ -53,14 +51,14 @@
                     {% endfor %}
                 </ul>
             </div>
-{#      AKORDEON I NAWIGACJA NA BOKU - KONIEC      #}
+            {#      AKORDEON I NAWIGACJA NA BOKU - KONIEC      #}
 
-{#      TREŚĆ ARTYKUŁU    #}
-            <div class="col-8">
+            {#      TREŚĆ ARTYKUŁU    #}
+            <div class="col-10 col-xxl-8">
 
                 <div class="post">
 
-        {#      ZDJĘCIE LUB FILM      #}
+                    {#      ZDJĘCIE LUB FILM      #}
                     <div class="post-media">
                         {% if post.mimetype != 'video/mp4' %}
                             <img src="{{ url_for('static', filename='/uploads/' + post.media) }}" class="img-fluid"
@@ -72,24 +70,24 @@
                             </video>
                         {% endif %}
                     </div>
-        {#      ZDJĘCIE LUB FILM - KONIEC      #}
+                    {#      ZDJĘCIE LUB FILM - KONIEC      #}
 
-        {#      ARTYKUŁ      #}
+                    {#      ARTYKUŁ      #}
                     <section class="post-content">
                         {% if user.has_role('admin') %}
-                        <div class="post-admin">
-                            <h1>{{ post.title }}</h1>
-                            <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj post</a>
-                        </div>
+                            <div class="post-admin">
+                                <h1>{{ post.title }}</h1>
+                                <a href="{{ url_for('views.edit_post', slug=post.slug) }}">Edytuj post</a>
+                            </div>
                         {% else %}
-                        <h1>{{ post.title }}</h1>
+                            <h1>{{ post.title }}</h1>
                         {% endif %}
                         {{ post.content|safe }}
                     </section>
-        {#      ARTYKUŁ - KONIEC      #}
+                    {#      ARTYKUŁ - KONIEC      #}
                 </div>
 
-        {#      NAWIGACJA POD POSTEM      #}
+                {#      NAWIGACJA POD POSTEM      #}
                 {% for link in posts %}
                     {% if link.title == post.title %}
                         {% if loop.nextitem and loop.previtem %}
@@ -118,11 +116,11 @@
                         {% endif %}
                     {% endif %}
                 {% endfor %}
-        {#      NAWIGACJA POD POSTEM - KONIEC      #}
+                {#      NAWIGACJA POD POSTEM - KONIEC      #}
 
             </div>
 
-{#      TREŚĆ ARTYKUŁU - KONIEC    #}
+            {#      TREŚĆ ARTYKUŁU - KONIEC    #}
         </div>
     </div>
 {% endblock %}

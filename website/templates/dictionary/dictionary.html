@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Post{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+
+
+            <div class="col-2">
+                <ul class="nav flex-column side-nav">
+                    {% for link in phrases %}
+                        <li class="nav-item side-nav-item active">
+                            <a href="{{ '#' + link.slug }}">{{ link.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-8">
+                <h1 class="title">SŁOWNICZEK</h1>
+                {% for phrase in phrases %}
+                    <div class="post" id="{{ phrase.slug }}">
+                        <section class="post-content-no-img">
+                            {% if user.has_role('admin') %}
+                                <div class="post-admin">
+                                    <h2>{{ phrase.title }}</h2>
+                                    <a href="{{ url_for('views.edit_phrase', slug=phrase.slug) }}">Edytuj frazę</a>
+                                </div>
+                            {% else %}
+                                <h2>{{ phrase.title }}</h2>
+                            {% endif %}
+                            {{ phrase.content|safe }}
+                        </section>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -12,6 +12,8 @@ from .views import inject_menu_items
 auth = Blueprint("auth", __name__)
 
 
+# TODO: PRZEKIEROWANIE PO REJESTRACJI I LOGOWANIU NIE DZIAŁA JEŚLI NIE MA OLLIE W TRICKI
+
 # TODO: spytać się czy da się to jakoś ładniej zrobić bo to jakiś żart jest
 @auth.context_processor
 def inject_menu_items():
@@ -22,6 +24,13 @@ def inject_menu_items():
     about_category = Category.query.filter(Category.id == 3).first()
     return dict(menu_trick_post=trick_post, menu_trick_category=trick_category,
                 menu_about_post=about_post, menu_about_category=about_category)
+
+
+# Query for data necessary to redirect to the first post in tricki category
+# def find_post_to_redirect():
+#     post = Post.query.filter(Post.category_id == 2).first()
+#     category = Category.query.filter(Category.id == 2).first()
+#     return [post.slug, category.name]
 
 
 # Validating email using simple regex expression
@@ -52,7 +61,7 @@ def login():
                     print(type(current_user.roles))
                     return redirect(url_for('views.admin_console'))
                 else:
-                    return redirect(url_for('views.show_post', slug='ollie', category='tricki'))
+                    return redirect(url_for('views.home'))
 
             else:
                 flash('The email address or password is incorrect.', category='error')
@@ -78,7 +87,7 @@ def sign_up():
         elif username_exists:
             flash('Please try another username', category='error')
         elif password2 != password1:
-            flash("Provided passwords aren't matching. Please try again", category='error')
+            flash("Wprowadzone hasła nie są identyczne. Wprowadź dane jeszcze raz.", category='error')
         elif len(username) < 2:
             flash('Your username is too short.', category='error')
         elif len(password1) < 8:
@@ -103,7 +112,7 @@ def sign_up():
             db.session.commit()
             login_user(new_user, remember=True)
             flash('New account created!')
-            return redirect(url_for('views.show_post', slug='ollie', category='tricki'))
+            return redirect(url_for('views.home'))
 
     # POSSIBLE IMPROVEMENT: confirmation by email.
 
@@ -114,6 +123,6 @@ def sign_up():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('views.show_post', slug='ollie', category='tricki'))
+    return redirect(url_for('views.home'))
 
 # POSSIBLE IMPROVEMENT: change password

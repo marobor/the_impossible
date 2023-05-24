@@ -77,6 +77,24 @@ def create_categories(*args, **kwargs):
     db.session.commit()
 
 
+class DictionaryPhrase(db.Model):
+    __tablename__ = 'dictionary_phrase'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(140))
+    slug = db.Column(db.String(140), unique=True)
+    content = db.Column(db.Text)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.generate_slug()
+
+    def generate_slug(self):
+        if self.title:
+            self.slug = slugify(self.title)
+        else:
+            self.slug = str(int(time()))
+
+
 # Create table in database for storing posts
 class Post(db.Model):
     __tablename__ = 'post'
@@ -102,9 +120,9 @@ class Post(db.Model):
 
 
 @event.listens_for(Post.__table__, 'after_create')
-def create_tricks(*args, **kwargs):
-    db.session.add(Trick(title='Hello world', content='Default post for category: triki', category_id=2))
-    db.session.add(Trick(title='Hello world', content='Default post for category: inne', category_id=3))
+def create_posts(*args, **kwargs):
+    db.session.add(Post(title='Hello trick', content='Default post for category: triki', category_id=2))
+    db.session.add(Post(title='Hello inne', content='Default post for category: inne', category_id=3))
     db.session.commit()
 
 

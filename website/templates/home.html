@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Post{% endblock %}
+{% block content %}
+    <video class="videoBackground" autoplay muted loop>
+        <source src="{{ url_for('static', filename="background.mp4") }}" type="video/mp4">
+    </video>
+    <div class="viewport-header">
+        <h1>
+            RODNEY MULLEN&nbsp;
+        </h1>
+        <p>I&nbsp;JEGO NAJPOPULARNIEJSZE TRICKI NA&nbsp;DESKOROLKĘ</p>
+    </div>
+    <div class="container-fluid">
+        <div class="row d-flex justify-content-center">
+            <div class="col-10 d-flex flex-column flex-xxl-row flex-xl-row flex-lg-row justify-content-evenly align-items-center">
+                <div class="nav-hero" id="tricks">
+                    <a class="main-link"
+                       href="{{ url_for('views.show_post', slug=menu_trick_post.slug, category=menu_trick_category.name) }}">
+                        O TRICKACH
+                    </a>
+                    <p>Zapoznaj się z trickami Rodney'a Mullena</p>
+                    <a href="{{ url_for('views.show_post', slug=menu_trick_post.slug, category=menu_trick_category.name) }}">
+                        <svg data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 283.46 283.46">
+                            <circle class="cls-1" cx="141.73" cy="141.73" r="141.73"></circle>
+                            <polygon class="cls-2"
+                                     points="126.28 78.06 164.88 117.4 31.78 116.13 31.34 161.82 164.45 163.09 125.11 201.68 157.11 234.3 252.12 141.07 158.9 46.06 126.28 78.06"></polygon>
+                        </svg>
+                    </a>
+                </div>
+                <div class="nav-hero" id="about">
+                    <a class="main-link"
+                       href="{{ url_for('views.show_post', slug=menu_about_post.slug, category=menu_about_category.name) }}">
+                        O STRONIE
+                    </a>
+                    <p>Dowiedz się więcej o serwisie</p>
+                    <a href="{{ url_for('views.show_post', slug=menu_about_post.slug, category=menu_about_category.name) }}">
+                        <svg data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 283.46 283.46">
+                            <circle class="cls-1" cx="141.73" cy="141.73" r="141.73"></circle>
+                            <polygon class="cls-2"
+                                     points="126.28 78.06 164.88 117.4 31.78 116.13 31.34 161.82 164.45 163.09 125.11 201.68 157.11 234.3 252.12 141.07 158.9 46.06 126.28 78.06"></polygon>
+                        </svg>
+                    </a>
+                </div>
+                <div class="nav-hero" id="dict">
+                    <a class="main-link" href="{{ url_for('views.dictionary') }}">
+                        SŁOWNICZEK
+                    </a>
+                    <p>Zajrzyj tutaj, jeśli czegoś nie rozumiesz</p>
+                    <a href="{{ url_for('views.dictionary') }}">
+                        <svg data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 283.46 283.46">
+                            <circle class="cls-1" cx="141.73" cy="141.73" r="141.73"></circle>
+                            <polygon class="cls-2"
+                                     points="126.28 78.06 164.88 117.4 31.78 116.13 31.34 161.82 164.45 163.09 125.11 201.68 157.11 234.3 252.12 141.07 158.9 46.06 126.28 78.06"></polygon>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <section class="col-10 col-xxl-8">
+                <h2>Kim jest Rodney Mullen?</h2>
+                <div class="post p-home">
+                    <div class="post-media">
+                        <img src="{{ url_for('static', filename='/img/814px-Rodney_Mullen_PopTech_2013_01_(cropped).jpg') }}"
+                             class="img-fluid"
+                             alt="Rodney Mullen">
+                    </div>
+                    <section class="post-content">
+                        <h3>Kariera sportowa</h3>
+                        <p>Rodney Mullen zdobył swoje pierwsze mistrzostwo świata w deskorolce w wieku 14 lat; w ciągu
+                            następnej dekady wygrał 34 z 35 zawodów freestyle'owych, ustanawiając tym samym najbardziej
+                            udaną serię rywalizacji w historii tego sportu. W kolejnych latach odszedł od freestyle'u,
+                            przekładając swoje zgromadzone umiejętności na nowszą, inną formę skateboardingu. Jest
+                            powszechnie uważany za najbardziej wpływowego street-skatera w historii tego sportu, który
+                            wynalazł wiele - jeśli nie większość - trików używanych obecnie, w tym street Ollie,
+                            kick-flip, 360-flip, Impossible itp. W konsekwencji Rodney został uznany za "ojca
+                            chrzestnego współczesnego street skatingu" w serii gier wideo Tony Hawk, w której jego
+                            postać pojawiała się przez około 8 lat.</p>
+                        <h3>Publikacje</h3>
+                        <p>W 2004 roku wydawnictwo Regan Books opublikowało jego autobiografię, napisaną wspólnie z
+                            Seanem Mortimerem. W wydaniu z grudnia 2006 r. Los Angeles Magazine umieścił go wśród 100
+                            najbardziej wpływowych osób. W 2011 roku Cole Louison napisał The Impossible, książkę o
+                            deskorolce jako całości, w dużej mierze z perspektywy wpływu Mullena. W 2013 roku Rodney
+                            został wprowadzony do Skateboarding Hall of Fame a jego deskorolka jest jednym z eksponatów
+                            w Narodowym Muzeum Historii Amerykańskiej w Waszyngtonie. Wystąpił również w uznanym filmie
+                            dokumentalnym Bones Brigade, An Autobiography.</p>
+                        <h3>Poza skateboardingiem</h3>
+                        <p>Mullen studiował matematykę i inżynierię na Uniwersytecie Florydy, zanim został
+                            współzałożycielem World Industries, największej firmy deskorolkowej w latach 90-tych, która
+                            ostatecznie została przejęta przez Globe Shoes, notowaną na giełdzie ASX. Nadal jeździ na
+                            deskorolce. Jego doświadczenie w skateboardingu w połączeniu z bardziej analitycznymi
+                            zainteresowaniami otworzyło mu drzwi do publikacji 5 patentów na decki i trucki do
+                            deskorolki. Rodney jest częścią społeczności TED - wygłosił przemówienia na dwóch TEDx, a
+                            także na innych podobnych, często technologicznych, forach, takich jak PopTech, Foo Camp
+                            itp.</p>
+                    </section>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}

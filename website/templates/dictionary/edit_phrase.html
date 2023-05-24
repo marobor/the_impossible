@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit phrase{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 align="center">Edytuj frazę {{ phrase.title }}</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <label for="title" class="form-label">Tytuł frazy</label>
+            <input type="text" id="title" name="title" class="form-control mb-4" value="{{ phrase.title }}">
+            <label for="content" class="form-label">Definicja</label>
+            <textarea name="content" id="content" class="form-control mb-4">{{ phrase.content }}</textarea>
+            <div align="center">
+                <button type="submit" class="btn btn-lg btn-primary">Edytuj</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

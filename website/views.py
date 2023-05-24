@@ -7,7 +7,7 @@ from datetime import datetime, date
 import os
 
 from . import db
-from .models import Post, Trick, TrickVariant, UsersTricks, UserData, slugify, Category
+from .models import Post, Trick, TrickVariant, UsersTricks, UserData, slugify, Category, DictionaryPhrase
 
 views = Blueprint("views", __name__)
 
@@ -23,9 +23,20 @@ def inject_menu_items():
                 menu_about_post=about_post, menu_about_category=about_category)
 
 
-@views.route("/")
-def intro():
-    return render_template("intro.html", user=current_user)
+# @views.route("/")
+# def intro():
+#     return render_template("intro.html", user=current_user)
+
+
+@views.errorhandler(404)
+def not_found(e):
+    return render_template('404.html', user=current_user)
+
+
+@views.route('/')
+def home():
+    # TODO: DOKOŃCZYĆ STRONĘ I ZREDAGOWAĆ TEKST, PRZEKIEROWANIE Z intro i logo strony
+    return render_template("home.html", user=current_user)
 
 
 @views.route("/about")
@@ -63,13 +74,14 @@ def my_trick(trick_slug):
     user_variants = [int(t[0]) for t in completed_variants]
 
     # Content of variant list depends on trick
-    if trick_slug.lower() == 'ollie':
-        variants = TrickVariant.query.filter(TrickVariant.name != 'nollie').all()
-    elif trick_slug.lower() == 'nollie':
-        variants = [TrickVariant.query.first()]
-        print(type(variants))
-    else:
-        variants = TrickVariant.query.all()
+    # if trick_slug.lower() == 'ollie':
+    #     variants = TrickVariant.query.filter(TrickVariant.name != 'nollie').all()
+    # elif trick_slug.lower() == 'nollie':
+    #     variants = [TrickVariant.query.first()]
+    #     print(type(variants))
+    # else:
+
+    variants = TrickVariant.query.all()
 
     return render_template('my_tricks.html', trick=trick, tricks=tricks,
                            user=current_user, all_variants=variants, user_variants=user_variants)
@@ -191,11 +203,11 @@ def admin_console():
     return render_template("admin/admin_console.html", user=current_user)
 
 
-# TODO: 404 jak nie znajdzie posta
+
 @views.route('<category>/<slug>')
 def show_post(slug, category):
-    post_category = Category.query.filter(Category.name == category).first()
-    post = Post.query.filter(Post.slug == slug).first()
+    post_category = Category.query.filter(Category.name == category).first_or_404()
+    post = Post.query.filter(Post.slug == slug).first_or_404()
     posts = Post.query.filter(Post.category_id == post_category.id).all()
     if post.media:
         return render_template('posts/post.html', post=post, posts=posts,
@@ -225,9 +237,13 @@ def create_post():
         file = request.files['file']
         category = request.form.get("category")
 
+        title_validation = Post.queru.filter(Post.title == title).first()
+
         if not title or not content or not category:    # or not file
             flash('Please fill in all the fields.', category='error')
-        # TODO: WALIDACJA CZY JEST JUŻ POST O TAKIEJ NAZWIE
+        elif title_validation:
+            flash('Post o takim tytule już istnieje - zmień tytuł', category='error')
+            render_template("posts/create_post.html", user=current_user, categories=categories)
         elif file:
             filename = secure_filename(file.filename)
             mimetype = file.content_type
@@ -297,6 +313,64 @@ def delete_post(slug):
     db.session.delete(post_to_delete)
     db.session.commit()
     return redirect(url_for('views.show_all_posts'))
+
+
+@views.route('/dictionary')
+def dictionary():
+    phrases = DictionaryPhrase.query.order_by(DictionaryPhrase.title)
+    return render_template('dictionary/dictionary.html', user=current_user, phrases=phrases)
+
+
+@views.route('/add-phrase', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def add_phrase():
+    if request.method == 'POST':
+        title = request.form.get("title")
+        content = request.form.get("content")
+        if not title or not content:
+            flash('Please fill in all the fields.', category='error')
+        else:
+            new_phrase = DictionaryPhrase(title=title, content=content)
+            db.session.add(new_phrase)
+            db.session.commit()
+            flash('Phrase created!', category='success')
+            # return redirect(url_for('views.admin_console'))
+    return render_template('dictionary/add_phrase.html', user=current_user)
+
+
+@views.route('/edit-phrase/<slug>', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def edit_phrase(slug):
+
+    phrase_to_edit = DictionaryPhrase.query.filter(DictionaryPhrase.slug == slug).first()
+
+    if request.method == 'POST':
+        title = request.form.get("title")
+        content = request.form.get("content")
+        if phrase_to_edit:
+            if not title or not content:
+                flash('Please fill in all the fields.', category='error')
+            else:
+                if title != phrase_to_edit.title:
+                    phrase_to_edit.slug = slugify(title)
+                    print(phrase_to_edit.slug)
+                phrase_to_edit.title = title
+                phrase_to_edit.content = content
+                db.session.add(phrase_to_edit)
+                db.session.commit()
+                flash('Fraza została zaktualizowana!', category='success')
+                return redirect(url_for('views.dictionary', _anchor=phrase_to_edit.slug))
+        else:
+            flash('Fraza nie została znaleziona.', category='error')
+            return redirect(url_for('views.admin_console'))
+    return render_template('dictionary/edit_phrase.html', user=current_user, phrase=phrase_to_edit)
+
+
+# @views.route('/dictionary/#x')
+# def show_dict_phrase():
+#     return render_template('dictionary/dictionary.html', user=current_user)
 
 
 @views.route('/create-trick', methods=['GET', 'POST'])
