@@ -18,8 +18,8 @@
             <div class="col-8">
                 <h1 class="title">SŁOWNICZEK</h1>
                 {% for phrase in phrases %}
-                    <div class="post" id="{{ phrase.slug }}">
-                        <section class="post-content-no-img">
+                    <div class="phrase" id="{{ phrase.slug }}">
+                        <section class="phrase-content">
                             {% if user.has_role('admin') %}
                                 <div class="post-admin">
                                     <h2>{{ phrase.title }}</h2>

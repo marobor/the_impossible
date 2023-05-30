@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Add a new trick{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 align="center">Edytuj trick</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            <label for="name" class="form-label">Nazwa tricku</label>
+            <input type="text" id="title" name="name" class="form-control mb-4" placeholder="Nazwa tricku" value="{{ trick.name }}">
+            <label for="points" class="form-label">Wartość punktowa</label>
+            <input type="text" id="points" name="points" class="form-control mb-4" value="{{ trick.value }}" placeholder="ile punktów przyznane będzie za ten trick">
+            <label for="tutorial_link" class="form-label">Link do wideoporadnika</label>
+            <input type="text" id="link" name="tutorial_link" class="form-control mb-4" placeholder="wklej link" value="{{ trick.tutorial_link }}">
+            <div align="center">
+                <button type="submit" class="btn btn-lg btn-primary">Zatwierdź zmiany</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

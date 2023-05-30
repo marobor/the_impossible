@@ -7,14 +7,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
 from .models import User, UserData, Role, Post, Category
-from .views import inject_menu_items
 
 auth = Blueprint("auth", __name__)
 
 
-# TODO: PRZEKIEROWANIE PO REJESTRACJI I LOGOWANIU NIE DZIAŁA JEŚLI NIE MA OLLIE W TRICKI
 
-# TODO: spytać się czy da się to jakoś ładniej zrobić bo to jakiś żart jest
 @auth.context_processor
 def inject_menu_items():
     trick_post = Post.query.filter(Post.category_id == 2).first()
@@ -50,10 +47,13 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if not is_email_valid(email) or not user:
-            flash('The email address or password is incorrect.', category='error')
+            flash('Wprowadzone dane są niepoprawne.', category='error')
+        elif user.active != 1:
+            flash('Logowanie nie powiodło się. Konto zostało dezaktywowane.', category='error')
+            return redirect(url_for('views.home'))
         else:
             if check_password_hash(user.password, password):
-                flash('Logged in!', category='success')
+                flash('Zalogowano!', category='success')
                 login_user(user, remember=True)
 
                 # admin is redirected to the admin panel, regular user to the home page
@@ -64,7 +64,7 @@ def login():
                     return redirect(url_for('views.home'))
 
             else:
-                flash('The email address or password is incorrect.', category='error')
+                flash('Wprowadzone dane są niepoprawne.', category='error')
 
     return render_template("login.html", user=current_user)
 
@@ -83,17 +83,17 @@ def sign_up():
         email_exists = User.query.filter_by(email=email).first()
         username_exists = UserData.query.filter_by(username=username).first()
         if email_exists:
-            flash('Email is already in use', category='error')
+            flash('Konto o takim adresie email już istnieje.', category='error')
         elif username_exists:
-            flash('Please try another username', category='error')
+            flash('Zmień nazwę użytkownika.', category='error')
         elif password2 != password1:
             flash("Wprowadzone hasła nie są identyczne. Wprowadź dane jeszcze raz.", category='error')
         elif len(username) < 2:
-            flash('Your username is too short.', category='error')
+            flash('Nazwa użytkownika jest za krótka.', category='error')
         elif len(password1) < 8:
-            flash('Your password is too short.', category='error')
+            flash('Twoje hasło jest za krótkie.', category='error')
         elif not is_email_valid(email):
-            flash('Email incorrect', category='error')
+            flash('Adres email jest niepoprawny', category='error')
         else:
             new_user = User(email=email, active=1,
                             password=generate_password_hash(password1, method='sha256',
@@ -111,7 +111,7 @@ def sign_up():
             db.session.add(new_user_data)
             db.session.commit()
             login_user(new_user, remember=True)
-            flash('New account created!')
+            flash('Nowe konto zostało utworzone!')
             return redirect(url_for('views.home'))
 
     # POSSIBLE IMPROVEMENT: confirmation by email.

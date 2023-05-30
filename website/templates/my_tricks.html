@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row">
-
+            <a class="go-back-sm" href="{{ url_for('views.profile') }}">WRÓĆ DO PROFILU</a>
             <div class="accordion side-nav-mobile" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
@@ -16,22 +16,31 @@
                          data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <ul class="nav flex-column">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ url_for('views.my_trick', trick_slug=trick.slug) }}">
-                                        Dodaj tricki
-                                    </a>
-                                    <a href="#" class="nav-link">
-                                        Zmień hasło
-                                    </a>
-                                </li>
+                                {% for link in tricks %}
+                                    {% if trick.name == link.name %}
+                                        <li class="nav-item side-nav-item active">
+                                            <a href="{{ url_for('views.my_trick', trick_slug=link.slug) }}">
+                                                {{ link.name|upper }}
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="nav-item side-nav-item">
+                                            <a href="{{ url_for('views.my_trick', trick_slug=link.slug) }}">
+                                                {{ link.name|upper }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-2">
+            <div class="col-1 col-lg-1 col-xl-2">
+
                 <ul class="nav flex-column side-nav" role="navigation">
+                    <a class="go-back" href="{{ url_for('views.profile') }}">WRÓĆ DO PROFILU</a>
                     {% for link in tricks %}
                         {% if trick.name == link.name %}
                             <li class="nav-item side-nav-item active">
@@ -50,66 +59,72 @@
                 </ul>
             </div>
 
-
-            <div class="col-6">
-                <div class="title">
-                <h1>{{ trick.name|upper }}</h1>
-                    <a href="{{ url_for('views.show_post', category='tricki', slug=trick.slug) }}">Zobacz opis tricku >></a>
-                </div>
-                <div class="variant-list">
-                    {% for variant in all_variants %}
-                        {% if variant.id in user_variants %}
-                            <div class="vl-btns">
-                                <p class="archived">
-                                    {{ variant.name|upper }}
-                                </p>
-                                <a class="nav-link"
-                                   href="{{ url_for('views.trick_archive', trick_slug=trick.slug, variant_slug=variant.slug) }}">
-                                    Zobacz Trick
-                                </a>
-                                <a class="nav-link"
-                                   href="{{ url_for('views.user_edit_trick', trick_slug=trick.slug, variant_slug=variant.slug) }}">
-                                    Edytuj Trick
-                                </a>
-                                <form method="POST"
-                                      action="{{ url_for('views.delete_trick', trick_slug=trick.slug, variant_slug=variant.slug) }}">
-                                    <input type="submit" class="nav-link" value="Usuń"
-                                           onclick="return confirm('Are you sure you want to delete this entry?')">
-                                </form>
+            <div class="col-10">
+                <div class="row">
+                    <div class="col-lg-8 col-xl-6 order-1">
+                        <div class="title">
+                            <h1>{{ trick.name|upper }}</h1>
+                            <div class="d-flex flex-column flex-lg-row">
+                                {% if article == True %}
+                                <a class="pe-3" href="{{ url_for('views.show_post', category='tricki', slug=trick.slug) }}">Przejdź do opisu</a>
+                                {% endif %}
+                                {% if trick.tutorial_link %}
+                                <a href="{{ trick.tutorial_link }}">Poradnik w języku angielskim</a>
+                                {% endif %}
                             </div>
+                        </div>
+                        <div class="variant-list">
+                            {% for variant in all_variants %}
+                                {% if variant.id in user_variants %}
+                                    <div class="vl-btns">
+                                        <p class="archived">
+                                            {{ variant.name|upper }}
+                                        </p>
+                                        <a class="nav-link"
+                                           href="{{ url_for('views.user_edit_trick', trick_slug=trick.slug, variant_slug=variant.slug) }}">
+                                            Edytuj Trick
+                                        </a>
+                                        <form method="POST"
+                                              action="{{ url_for('views.delete_user_trick', trick_slug=trick.slug, variant_slug=variant.slug) }}">
+                                            <input type="submit" class="nav-link" value="Usuń"
+                                                   onclick="return confirm('Are you sure you want to delete this entry?')">
+                                        </form>
+                                    </div>
 
-                        {% else %}
-                            <div class="vl-btns">
-                                <p>
-                                    {{ variant.name|upper }}
-                                </p>
-                                <a class="nav-link"
-                                   href="{{ url_for('views.add_trick', trick_slug=trick.slug, variant_slug=variant.slug) }}">
-                                    Dodaj Trick
-                                </a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
+                                {% else %}
+                                    <div class="vl-btns">
+                                        <p>
+                                            {{ variant.name|upper }}
+                                        </p>
+                                        <a class="nav-link"
+                                           href="{{ url_for('views.add_trick', trick_slug=trick.slug, variant_slug=variant.slug) }}">
+                                            Dodaj Trick
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
 
-            <div class="col-lg-4 order-1 order-lg-2 order-xl-2 order-xxl-2 profile-sidebar">
-                <div class="sidebar-item">
-                    <h3>JAK TO DZIAŁA?</h3>
-                    <p>Dodawaj tricki, które udało ci się wykonać i śledź swój postęp.</p>
-                    <a href="#">Dowiedz się więcej >></a>
-                </div>
-                <div class="sidebar-item">
-                    <h3>SŁOWNICZEK</h3>
-                    <p>Goofie?! Przecież to miała byc strona o deskorolce.
-                        Zajrzyj do słowniczka, jeśli czegoś nie rozumiesz — możliwe,
-                        że znajdziesz tam przydatne informacje.</p>
-                    <a href="#">Przejdź do słowniczka >></a>
-                </div>
-                <div class="sidebar-item">
-                    <h3>CHCESZ WIEDZIEĆ WIĘCEJ?</h3>
-                    <p>Rzuć okiem na ciekawe, moim zdaniem, treści i zaspokój głód wiedzy.</p>
-                    <a href="#">Więcej treści >></a>
+                    <div class="col-lg-4 col-xl-5 order-2 profile-sidebar">
+                        <div class="d-none d-lg-flex sidebar-item">
+                            <h3>JAK TO DZIAŁA?</h3>
+                            <p>Dodawaj tricki, które udało ci się wykonać i zdobywaj punkty.</p><br>
+                            <p>Ilość przyznawanych punktów różni się w zależności od poziomu trudności.</p><br>
+                            <p>Zdobądź więcej punktów ucząc się różnych wariantów!</p>
+                        </div>
+                        <div class="sidebar-item">
+                            <h3>SŁOWNICZEK</h3>
+                            <p>Zajrzyj do słowniczka, jeśli czegoś nie rozumiesz — możliwe,
+                                że znajdziesz tam przydatne informacje.</p>
+                            <a href="{{ url_for('views.dictionary') }}">Przejdź do słowniczka >></a>
+                        </div>
+                        <div class="d-none d-lg-flex sidebar-item">
+                            <h3>CHCESZ WIEDZIEĆ WIĘCEJ?</h3>
+                            <p>Rzuć okiem na ciekawe treści i zaspokój głód wiedzy.</p>
+                            <a href="{{ url_for('views.learn_more') }}">Więcej treści >></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,17 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Add a new trick{% endblock %}
 {% block content %}
-    <div class="container">
+    <div class="container trick-form">
         <h1 align="center">{{ variant.name }} {{ trick.name }}</h1>
 
         <form method="POST" enctype="multipart/form-data">
-            <label for="date" class="form-label">Date</label>
+            <label for="date" class="form-label">Data wykonania tricku</label>
             <input type="date" id="date" name="date" class="form-control mb-4" value="{{ info.created_at }}">
-            <label for="name" class="form-label">Note</label>
+            <label for="name" class="form-label">Notatka</label>
             <input type="text" id="note" name="note" class="form-control mb-4" value="{{ info.content }}">
-            <div align="center">
-                <button type="submit" class="btn btn-lg btn-primary">Add</button>
-            </div>
+            <button type="submit" class="btn btn-lg btn-primary">Zapisz trick</button>
+
         </form>
     </div>
 {% endblock %}

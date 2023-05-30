@@ -7,7 +7,7 @@ from datetime import datetime, date
 import os
 
 from . import db
-from .models import Post, Trick, TrickVariant, UsersTricks, UserData, slugify, Category, DictionaryPhrase
+from .models import Post, Trick, TrickVariant, User, Role, roles_users, UsersTricks, UserData, slugify, Category, DictionaryPhrase
 
 views = Blueprint("views", __name__)
 
@@ -35,7 +35,6 @@ def not_found(e):
 
 @views.route('/')
 def home():
-    # TODO: DOKOŃCZYĆ STRONĘ I ZREDAGOWAĆ TEKST, PRZEKIEROWANIE Z intro i logo strony
     return render_template("home.html", user=current_user)
 
 
@@ -73,18 +72,16 @@ def my_trick(trick_slug):
     # Tuple to int conversion
     user_variants = [int(t[0]) for t in completed_variants]
 
-    # Content of variant list depends on trick
-    # if trick_slug.lower() == 'ollie':
-    #     variants = TrickVariant.query.filter(TrickVariant.name != 'nollie').all()
-    # elif trick_slug.lower() == 'nollie':
-    #     variants = [TrickVariant.query.first()]
-    #     print(type(variants))
-    # else:
+    trick_article = Post.query.filter(Post.slug == trick_slug).first()
+    if trick_article:
+        article = True
+    else:
+        article = False
 
     variants = TrickVariant.query.all()
 
     return render_template('my_tricks.html', trick=trick, tricks=tricks,
-                           user=current_user, all_variants=variants, user_variants=user_variants)
+                           user=current_user, all_variants=variants, user_variants=user_variants, article=article)
 
 
 def add_points(counter, trick_value):
@@ -130,27 +127,26 @@ def add_trick(trick_slug, variant_slug):
                                     content=note, created_at=new_date)
             db.session.add(new_trick)
             db.session.commit()
-            flash('New trick added. Congratulations!', category='success')
+            flash('Gratulacje! Dodałeś nowy trick.', category='success')
             return redirect(url_for('views.my_trick', trick_slug=trick_slug))
     else:
-        flash('You already added this trick', category='error')
+        flash('Dodałeś już taki trick', category='error')
         return redirect(url_for('views.my_trick', trick_slug=trick_slug))
 
     return render_template('tricks/create_users_tricks.html', trick=trick, variant=variant, date=default_date,
                            user=current_user)
 
 
-@views.route('/trick-archive/<trick_slug>/<variant_slug>')
-@login_required
-def trick_archive(trick_slug, variant_slug):
-    trick = Trick.query.filter(Trick.slug == trick_slug).first()
-    variant = TrickVariant.query.filter(TrickVariant.slug == variant_slug).first()
-    trick_check = UsersTricks.query.filter(UsersTricks.trick_id == trick.id,
-                                           UsersTricks.trick_variant_id == variant.id,
-                                           UsersTricks.user_id == current_user.id).first_or_404()
-    # TODO: jeśli nie ma rekordu to przekierowanie i flash
-    return render_template('tricks/trick_archive.html', trick=trick, variant=variant, info=trick_check,
-                           user=current_user)
+# @views.route('/trick-archive/<trick_slug>/<variant_slug>')
+# @login_required
+# def trick_archive(trick_slug, variant_slug):
+#     trick = Trick.query.filter(Trick.slug == trick_slug).first()
+#     variant = TrickVariant.query.filter(TrickVariant.slug == variant_slug).first()
+#     trick_check = UsersTricks.query.filter(UsersTricks.trick_id == trick.id,
+#                                            UsersTricks.trick_variant_id == variant.id,
+#                                            UsersTricks.user_id == current_user.id).first_or_404()
+#     return render_template('tricks/trick_archive.html', trick=trick, variant=variant, info=trick_check,
+#                            user=current_user)
 
 
 @views.route('/edit-trick/<trick_slug>/<variant_slug>', methods=['GET', 'POST'])
@@ -171,10 +167,10 @@ def user_edit_trick(trick_slug, variant_slug):
                 trick_check.created_at = new_date
             db.session.add(trick_check)
             db.session.commit()
-            flash('Trick edited.', category='success')
+            flash('Zmiany zostały zapisane', category='success')
             return redirect(url_for('views.profile'))
     else:
-        flash("You haven't added this trick yet. ", category='error')
+        flash("Nie dodałeś jeszcze takiego tricku", category='error')
         return redirect(url_for('views.my_trick', trick_slug=trick_slug))
     return render_template('tricks/edit_trick.html', trick=trick, variant=variant, info=trick_check,
                            user=current_user)
@@ -182,7 +178,7 @@ def user_edit_trick(trick_slug, variant_slug):
 
 @views.route('/delete-trick/<trick_slug>/<variant_slug>', methods=['GET', 'POST'])
 @login_required
-def delete_trick(trick_slug, variant_slug):
+def delete_user_trick(trick_slug, variant_slug):
     trick = Trick.query.filter(Trick.slug == trick_slug).first()
     variant = TrickVariant.query.filter(TrickVariant.slug == variant_slug).first()
     trick_to_delete = UsersTricks.query.filter(UsersTricks.trick_id == trick.id,
@@ -217,7 +213,7 @@ def show_post(slug, category):
                                user=current_user, category=post_category.name)
 
 
-# TODO: DOKOŃCZYĆ WYŚWIETLANIE WSZYSTKICH POSTÓW - lista do edycji i usuwania
+
 @views.route('/all-posts')
 @login_required
 @roles_required('admin')
@@ -267,39 +263,45 @@ def create_post():
 @roles_required('admin')
 def edit_post(slug):
 
-    # TODO: usuwanie obrazka
     post_to_edit = Post.query.filter(Post.slug == slug).first()
     current_category = Category.query.filter(Category.id == post_to_edit.category_id).first()
     categories = Category.query.filter(Category.id != post_to_edit.category_id).all()
 
     if request.method == 'POST':
-        title = request.form.get("title")
-        content = request.form.get("content")
-        file = request.files['file']
-        category = request.form.get('category')
-        if post_to_edit:
-            filename = secure_filename(file.filename)
-
-            if filename and filename != post_to_edit.media:
-                mimetype = file.content_type
-                file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-                post_to_edit.mimetype = mimetype
-                post_to_edit.media = filename
-            if title != post_to_edit.title:
-                post_to_edit.slug = slugify(title)
-
-            post_to_edit.title = title
-            post_to_edit.content = content
-            post_to_edit.category_id = category
-            post_to_edit.edited_at = datetime.now()
-
+        if 'delete_file' in request.form:
+            post_to_edit.media = ''
+            post_to_edit.mimetype = ''
             db.session.add(post_to_edit)
             db.session.commit()
-            flash('Post edited!', category='success')
-            return redirect(url_for('views.show_all_posts'))
+            return redirect(url_for('views.edit_post', slug=slug))
         else:
-            flash('Post not found.', category='error')
-            return redirect(url_for('views.all-posts'))
+            title = request.form.get("title")
+            content = request.form.get("content")
+            file = request.files['file']
+            category = request.form.get('category')
+            if post_to_edit:
+                filename = secure_filename(file.filename)
+
+                if filename and filename != post_to_edit.media:
+                    mimetype = file.content_type
+                    file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                    post_to_edit.mimetype = mimetype
+                    post_to_edit.media = filename
+                if title != post_to_edit.title:
+                    post_to_edit.slug = slugify(title)
+
+                post_to_edit.title = title
+                post_to_edit.content = content
+                post_to_edit.category_id = category
+                post_to_edit.edited_at = datetime.now()
+
+                db.session.add(post_to_edit)
+                db.session.commit()
+                flash('Post edited!', category='success')
+                return redirect(url_for('views.show_all_posts'))
+            else:
+                flash('Post not found.', category='error')
+                return redirect(url_for('views.all-posts'))
 
     return render_template('posts/edit_post.html', post=post_to_edit,
                            user=current_user, current_category=current_category.name, categories=categories)
@@ -368,9 +370,12 @@ def edit_phrase(slug):
     return render_template('dictionary/edit_phrase.html', user=current_user, phrase=phrase_to_edit)
 
 
-# @views.route('/dictionary/#x')
-# def show_dict_phrase():
-#     return render_template('dictionary/dictionary.html', user=current_user)
+@views.route('/show_tricks', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def show_tricks():
+    tricks = Trick.query.all()
+    return render_template("admin/show_tricks.html", tricks=tricks, user=current_user)
 
 
 @views.route('/create-trick', methods=['GET', 'POST'])
@@ -379,16 +384,53 @@ def edit_phrase(slug):
 def create_trick():
     if request.method == 'POST':
         name = request.form.get("name")
-        if not name:
+        points = request.form.get("points")
+        tutorial_link = request.form.get("tutorial_link")
+        if not name and not points:
             flash('Please fill in all the fields.', category='error')
         else:
-            new_trick = Trick(name=name)
+            new_trick = Trick(name=name, points=points, link=tutorial_link)
             db.session.add(new_trick)
             db.session.commit()
             flash('Trick created!', category='success')
             # return redirect(url_for('views.admin_console'))
 
     return render_template("admin/create_trick.html", user=current_user)
+
+
+@views.route('/edit-trick/<slug>', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def edit_trick(slug):
+    trick_to_edit = Trick.query.filter(Trick.slug == slug).first()
+
+    if request.method == 'POST':
+        name = request.form.get("name")
+        points = request.form.get("points")
+        tutorial_link = request.form.get("tutorial_link")
+        if not trick_to_edit:
+            flash('Trick nie istnieje', category='error')
+            return redirect(url_for('views.admin_console'))
+        else:
+            if trick_to_edit.name != name:
+                trick_to_edit.slug = slugify(name)
+            trick_to_edit.name, trick_to_edit.points, trick_to_edit.tutorial_link = name, points, tutorial_link
+            db.session.add(trick_to_edit)
+            db.session.commit()
+            flash('Trick created!', category='success')
+            return redirect(url_for('views.show_tricks'))
+
+    return render_template("admin/edit_trick.html", trick=trick_to_edit, user=current_user)
+
+
+@views.route('/delete-trick/<slug>', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def delete_trick(slug):
+    trick_to_delete = Trick.query.filter(Trick.slug == slug).first()
+    db.session.delete(trick_to_delete)
+    db.session.commit()
+    return redirect(url_for('views.show_tricks'))
 
 
 @views.route('/create-variant', methods=['GET', 'POST'])
@@ -407,3 +449,33 @@ def create_variant():
             # return redirect(url_for('views.admin_console'))
 
     return render_template("admin/create_variant.html", user=current_user)
+
+
+@views.route('/users', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def show_users():
+    users = db.session.query(User).filter(User.id != current_user.id).all()
+
+    return render_template("admin/show_users.html", user=current_user, users=users)
+
+
+@views.route('/deactivate/<u_id>', methods=['GET', 'POST'])
+@login_required
+@roles_required('admin')
+def deactivate_user(u_id):
+    if request.method == 'POST' and 'deactivate' in request.form:
+        d_user = User.query.filter(User.id == u_id).first()
+        if d_user.active == 1:
+            d_user.active = 0
+        else:
+            d_user.active = 1
+        db.session.add(d_user)
+        db.session.commit()
+    return redirect(url_for('views.show_users'))
+
+
+@views.route('/learn-more')
+@login_required
+def learn_more():
+    return render_template("learn_more.html", user=current_user)

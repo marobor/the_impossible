@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Wszystkie tricki{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 align="center">Wszystkie tricki</h1>
+        <ul>
+            {% for trick in tricks %}
+                <li>
+                    <p>{{ trick.name }}</p>
+                    <a href="{{ url_for('views.edit_trick', slug=trick.slug) }}">Edytuj trick</a>
+                    <form method="POST" class="d-inline-flex"
+                          action="{{ url_for('views.delete_trick', slug=trick.slug) }}">
+                        <input type="submit" class="nav-link" value="Usuń"
+                               onclick="return confirm('Czy na pewno chcesz usunąć ten trick?')">
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

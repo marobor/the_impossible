@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Add a new trick{% endblock %}
 {% block content %}
-    <div class="container">
-        <h1 align="center">{{ variant.name }} {{ trick.name }}</h1>
+    <div class="container trick-form">
+        <h1 align="center">{{ variant.name|upper }} {{ trick.name|upper}}</h1>
 
         <form method="POST" enctype="multipart/form-data">
-            <label for="name" class="form-label">Note</label>
-            <input type="text" id="note" name="note" class="form-control mb-4" placeholder="Write a note">
-            <label for="date" class="form-label">Date</label>
-            <p>Jeśli nie ustawisz własnej daty, to automatycznie ustawi się aktualny czas.</p>
+            <label for="name" class="form-label">Notatka</label>
+            <input type="text" id="note" name="note" class="form-control mb-4" placeholder="Wpisz np. miejsce wykonania tricku.">
+            <label for="date" class="form-label">Data wykonania tricku</label>
+            <p>Automatycznie ustawiana jest dzisiejsza data.</p>
             <input type="date" id="date" name="date" class="form-control mb-4" value="{{ date }}">
             <div align="center">
-                <button type="submit" class="btn btn-lg btn-primary">Add</button>
+                <button type="submit" class="btn btn-lg btn-primary">Dodaj trick</button>
             </div>
         </form>
     </div>

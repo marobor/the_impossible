@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Wszyscy użytkownicy{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 align="center">Lista użytkowników</h1>
+        <table>
+            <tbody>
+            <tr>
+                <th>Nazwa użytkownika</th>
+                <th>Adres e-mail</th>
+                <th>Data utworzenia konta</th>
+                <th>Role użytkownika</th>
+                <th>Aktywny</th>
+                <th>Aktywuj/Dezaktywuj konto</th>
+            </tr>
+            <tr>{% for user in users %}
+                <td>{{ user.user_data.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.user_data.created_at }}</td>
+                <td>
+                    {% for role in user.roles%}
+                    {{ role.name }}
+                    {% endfor %}
+                </td>
+                {% if user.active == 1 %}
+                <td>Tak</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('views.deactivate_user', u_id=user.id) }}">
+                        <input type="submit" name="deactivate" value="Dezaktywuj"
+                               onclick="return confirm('' +
+                                'Czy dezaktywować konto? Dane nie zostaną usunięte.')">
+                    </form>
+                </td>
+                {% else %}
+                <td>Nie</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('views.deactivate_user', u_id=user.id) }}">
+                        <input type="submit" name="deactivate" value="Aktywuj"
+                               onclick="return confirm('' +
+                                'Czy aktywować konto?')">
+                    </form>
+                </td>
+                {% endif %}
+            {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

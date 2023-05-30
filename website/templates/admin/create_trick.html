@@ -5,10 +5,14 @@
         <h1 align="center">Add a new trick</h1>
 
         <form method="POST" enctype="multipart/form-data">
-            <label for="name" class="form-label">Trick name</label>
-            <input type="text" id="title" name="name" class="form-control mb-4" placeholder="Write a trick name">
+            <label for="name" class="form-label">Nazwa tricku</label>
+            <input type="text" id="title" name="name" class="form-control mb-4" placeholder="Nazwa tricku">
+            <label for="points" class="form-label">Wartość punktowa</label>
+            <input type="text" id="points" name="points" class="form-control mb-4" placeholder="ile punktów przyznane będzie za ten trick">
+            <label for="link" class="form-label">Link do wideoporadnika</label>
+            <input type="text" id="link" name="link" class="form-control mb-4" placeholder="wklej link">
             <div align="center">
-                <button type="submit" class="btn btn-lg btn-primary">Add</button>
+                <button type="submit" class="btn btn-lg btn-primary">Dodaj</button>
             </div>
         </form>
     </div>

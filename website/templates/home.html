@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Post{% endblock %}
+{% block title %}Strona główna{% endblock %}
 {% block content %}
     <video class="videoBackground" autoplay muted loop>
         <source src="{{ url_for('static', filename="background.mp4") }}" type="video/mp4">
@@ -14,11 +14,10 @@
         <div class="row d-flex justify-content-center">
             <div class="col-10 d-flex flex-column flex-xxl-row flex-xl-row flex-lg-row justify-content-evenly align-items-center">
                 <div class="nav-hero" id="tricks">
-                    <a class="main-link"
-                       href="{{ url_for('views.show_post', slug=menu_trick_post.slug, category=menu_trick_category.name) }}">
+                    <p class="main-link">
                         O TRICKACH
-                    </a>
-                    <p>Zapoznaj się z trickami Rodney'a Mullena</p>
+                    </p>
+                    <p>Poznaj tricki Rodney'a Mullena</p>
                     <a href="{{ url_for('views.show_post', slug=menu_trick_post.slug, category=menu_trick_category.name) }}">
                         <svg data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg"
                              viewBox="0 0 283.46 283.46">
@@ -29,11 +28,10 @@
                     </a>
                 </div>
                 <div class="nav-hero" id="about">
-                    <a class="main-link"
-                       href="{{ url_for('views.show_post', slug=menu_about_post.slug, category=menu_about_category.name) }}">
+                    <p class="main-link">
                         O STRONIE
-                    </a>
-                    <p>Dowiedz się więcej o serwisie</p>
+                    </p>
+                    <p>Tutaj znajdziesz informacje o serwisie</p>
                     <a href="{{ url_for('views.show_post', slug=menu_about_post.slug, category=menu_about_category.name) }}">
                         <svg data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg"
                              viewBox="0 0 283.46 283.46">
@@ -44,9 +42,9 @@
                     </a>
                 </div>
                 <div class="nav-hero" id="dict">
-                    <a class="main-link" href="{{ url_for('views.dictionary') }}">
+                    <p class="main-link">
                         SŁOWNICZEK
-                    </a>
+                    </p>
                     <p>Zajrzyj tutaj, jeśli czegoś nie rozumiesz</p>
                     <a href="{{ url_for('views.dictionary') }}">
                         <svg data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg"

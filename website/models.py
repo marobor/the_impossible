@@ -10,7 +10,6 @@ from sqlalchemy.sql import func
 
 from sqlalchemy import event
 
-# TODO: set correct nullability
 
 # Create table in database for user_role relationship
 roles_users = db.Table('roles_users',
@@ -34,7 +33,7 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     user_data = db.relationship("UserData", uselist=False, backref="user")
     # backreferences the user_id from roles_users table
-    roles = db.relationship('Role', secondary=roles_users)
+    roles = db.relationship('Role', secondary=roles_users, backref="user")
     users_ticks = db.relationship('UsersTricks', backref='user')
 
 
@@ -83,6 +82,8 @@ class DictionaryPhrase(db.Model):
     title = db.Column(db.String(140))
     slug = db.Column(db.String(140), unique=True)
     content = db.Column(db.Text)
+    # source = db.Column(db.String(200))
+    # is_source_a_link = db.Column(db.Boolean())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -134,6 +135,7 @@ class Trick(db.Model):
     slug = db.Column(db.String(140))
     users_ticks = db.relationship('UsersTricks', backref='trick')
     value = db.Column(db.Integer)
+    tutorial_link = db.Column(db.String(140))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -193,5 +195,4 @@ class UsersTricks(db.Model):
     trick_variant_id = db.Column(db.Integer, db.ForeignKey('trick_variant.id'))
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     content = db.Column(db.Text)
-    # TODO: można dodać fotkę lub film
 
